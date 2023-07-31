@@ -1,0 +1,23 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="productForm">
+  <div>
+    <label>title:</label>
+    <input type="text" formControlName="title" />
+  </div>
+  <div>
+    <label>description:</label>
+    <input type="text" formControlName="description" />
+  </div>
+  <div>
+    <label>Precio:</label>
+    <input type="text" formControlName="price" />
+  </div>
+  <div>
+    <label>Imagenes:</label>
+    <input type="file" multiple (change)="onFileChanged($event)" #fileInput />
+  </div>
+  <button type="submit">Enviar</button>
+</form>
+
+<div *ngFor="let item of " class="imagenes">
+  <img src = "`http://localhost:3000/product/${item}`" alt="new image" />
+</div>

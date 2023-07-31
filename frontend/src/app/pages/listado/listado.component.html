@@ -1,0 +1,12 @@
+<p>listado works!</p>
+
+<a routerLink="/create">Ir a crear</a>
+
+<div class="container">
+    <div *ngFor="let item of productos" class="registros">
+   {{item.title}}
+   <div  *ngFor="let imagen of item.images " class="imagenes">
+    <img src="http://localhost:3000/{{imagen.url}}"  alt="">
+   </div>
+    </div>
+</div>
