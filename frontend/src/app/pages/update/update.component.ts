@@ -27,23 +27,24 @@ export class UpdateComponent implements OnInit{
       title: [''],
       description: [''],
       price: [0],
-      images:[[]]
-    });
+        });
   }
   ngOnInit(): void {
     this.productId = parseInt(this.route.snapshot.paramMap.get('id')!);
   
     this.product$ = this.productService.getOne(this.productId);
     this.product$.subscribe((data) => {
-      console.log(data);
+      console.log('primer data',data);
       this.producto = data;
       this.productForm.setValue({
         title: this.producto.title,
         description: this.producto.description,
         price: this.producto.price,
-        images:this.producto.images
+       
       });
+      this.files=this.producto.images
     });
+  
   }
 
   onFileChanged(event: any) {
@@ -54,6 +55,7 @@ export class UpdateComponent implements OnInit{
   }
 
   onSubmit() {
+    console.log('formulario',this.productForm.value)
     const formData = new FormData();
     for  (var i =  0; i <  this.files.length; i++)  {  
       formData.append("files",  this.files[i]);
@@ -64,7 +66,7 @@ export class UpdateComponent implements OnInit{
     formData.append('price', this.productForm.get('price')!.value);
   console.log('files', this.files)
 
-    this.productService.createProduct(formData).subscribe((data:any)=>{
+    this.productService.actualizaProducto(this.productId,formData).subscribe((data:any)=>{
    console.log('mi data', data)
    this.files=[]
    this.router.navigate(['listado'])

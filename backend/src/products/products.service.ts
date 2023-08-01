@@ -14,6 +14,8 @@ export class ProductsService {
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
   ) {}
+
+  //crea producto
   async create(imagenes: any[], createProductDto: CreateProductDto) {
     try {
       const product = this.productRepository.create({
@@ -48,8 +50,24 @@ export class ProductsService {
     });
   }
 
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
+  //actualiza el producto
+  async updateProducto(id: number, files, updateProductDto: any) {
+    console.log('actualiza paciente ', updateProductDto);
+    const { title, description, price } = updateProductDto;
+
+    const producto = await this.productRepository.findOne({
+      where: { id },
+    });
+
+    //const doctorIds = doctors;
+    //const doctores = await this.doctorRepository.findBy({ id: In(doctorIds) });
+    //console.log('mihospital/paciente', mihospital, paciente, doctores);
+    producto.title = title;
+    producto.description = description;
+    producto.price = price;
+   // producto.images = images;
+
+    return this.productRepository.save(producto);
   }
 
   remove(id: number) {
