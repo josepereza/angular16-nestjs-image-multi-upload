@@ -1,27 +1,48 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { ProductService } from 'src/app/services/product.service';
 
 @Component({
-  selector: 'app-create',
-  templateUrl: './create.component.html',
-  styleUrls: ['./create.component.css'],
+  selector: 'app-update',
+  templateUrl: './update.component.html',
+  styleUrls: ['./update.component.css']
 })
-export class CreateComponent {
+export class UpdateComponent implements OnInit{
+  product$!: Observable<any>;
+  producto:any;
   productForm!: FormGroup;
   selectedFile!: any;
   files:string  []  =  [];
+  productId!:any;
  imagenesBackend:string[]=[];
   constructor(
     private fb: FormBuilder,
     private productService: ProductService,
-    private router:Router
+    private router:Router,
+    private route: ActivatedRoute,
   ) {
     this.productForm = this.fb.nonNullable.group({
       title: [''],
       description: [''],
       price: [0],
+      images:[[]]
+    });
+  }
+  ngOnInit(): void {
+    this.productId = parseInt(this.route.snapshot.paramMap.get('id')!);
+  
+    this.product$ = this.productService.getOne(this.productId);
+    this.product$.subscribe((data) => {
+      console.log(data);
+      this.producto = data;
+      this.productForm.setValue({
+        title: this.producto.title,
+        description: this.producto.description,
+        price: this.producto.price,
+        images:this.producto.images
+      });
     });
   }
 

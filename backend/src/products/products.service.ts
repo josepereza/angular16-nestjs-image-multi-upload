@@ -38,7 +38,14 @@ export class ProductsService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} product`;
+    return this.productRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        images: true,
+      },
+    });
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
