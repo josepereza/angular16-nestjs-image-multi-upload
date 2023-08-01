@@ -82,10 +82,19 @@ export class ProductsController {
     @UploadedFiles() files: Array<Express.Multer.File>,
     @Param('id') id: string,
   ) {
+    this.imagenes2 = [];
+    console.log('files', files);
+    files.map((imagen) => {
+      this.imagenes2.push(imagen.filename);
+    });
     console.log('update desde el controller', updateProductDto);
     console.log('el id controller', id);
     console.log('files controller', files);
-    return this.productsService.updateProducto(+id, files, updateProductDto);
+    return this.productsService.updateProducto(
+      +id,
+      this.imagenes2,
+      updateProductDto,
+    );
   }
 
   @Delete(':id')

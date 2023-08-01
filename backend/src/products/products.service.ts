@@ -52,7 +52,7 @@ export class ProductsService {
 
   //actualiza el producto
   async updateProducto(id: number, files, updateProductDto: any) {
-    console.log('actualiza paciente ', updateProductDto);
+    console.log('actualiza mi producto ', files);
     const { title, description, price } = updateProductDto;
 
     const producto = await this.productRepository.findOne({
@@ -65,8 +65,15 @@ export class ProductsService {
     producto.title = title;
     producto.description = description;
     producto.price = price;
-   // producto.images = images;
+    if (files.length > 0) {
+      producto.images = files.map((image) =>
+        this.productImageRepository.create({ url: image }),
+      );
+      this.productImageRepository.delete({ product: producto });
+    }
 
+    // producto.images = images;
+   
     return this.productRepository.save(producto);
   }
 
