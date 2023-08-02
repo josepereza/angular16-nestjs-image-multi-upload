@@ -25,4 +25,7 @@ return this.http.post('http://localhost:3000/products', product)
   listadoProducts(){
     return this.http.get('http://localhost:3000/products')
   }
+  deleteProducto(id:number){
+    return this.http.delete(`http://localhost:3000/products/${id}`)
+  }
 }

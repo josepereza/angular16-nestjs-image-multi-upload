@@ -19,4 +19,12 @@ export class ListadoComponent implements OnInit {
   update(id: number) {
     this.router.navigate(['update',id]);
   }
+  eliminar(id:number){
+    this.productService.deleteProducto(id).subscribe(data=>{
+      this.productService.listadoProducts().subscribe((data: any) => {
+        console.log(data);
+        this.productos = data;
+      });
+    })
+  }
 }

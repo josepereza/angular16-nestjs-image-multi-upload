@@ -1,12 +1,23 @@
 <p>listado works!</p>
 
-<a routerLink="/create">Ir a crear</a>
+<a routerLink="/create">Nuevo Producto</a>
 
-<div class="container">
-    <div *ngFor="let item of productos" class="registros" (click)="update(item.id)" >
-   <h2>  {{item.title}}</h2>
-   <div  *ngFor="let imagen of item.images " class="imagenes">
-    <img src="http://localhost:3000/{{imagen.url}}" width="200px" alt="">
-   </div>
-    </div>
-</div>
+
+<table style="width:100%">
+    <tr>
+      <th>Titulo</th>
+      <th>Description</th>
+      <th>Price</th>
+      <th>Imagenes</th>
+    </tr>
+    <tr *ngFor="let item of productos" class="registros">
+      <td>{{item.title}}</td>
+      <td>{{item.description}}</td>
+      <td>{{item.price}}</td>
+      <td *ngFor="let imagen of item.images " class="imagenes"><img src="http://localhost:3000/{{imagen.url}}" width="40px" alt=""></td>
+      <td><a [routerLink]="['/update', item.id]">Editar</a></td>
+      <td><button (click)="eliminar(item.id)">Eliminar</button></td>
+
+    </tr>
+    
+  </table>

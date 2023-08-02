@@ -115,6 +115,7 @@ export class ProductsService {
 
   //elimina producto
   async remove(id: number) {
+    console.log('borrar producto', id)
     const product = await this.findOne(id);
     await this.productRepository.remove(product);
   }
