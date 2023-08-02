@@ -56,14 +56,13 @@ export class ProductsService {
     });
   }
 
- 
   //actualiza el producto 2:forma.
   async updateProducto(id: number, updateProductDto: any) {
     const { images, ...update } = updateProductDto;
 
     console.log('imagenes', images);
     console.log('update ', update);
-    console.log('updateProducto', updateProductDto)
+    console.log('updateProducto', updateProductDto);
 
     const product = await this.productRepository.preload({ id, ...update });
 
@@ -115,7 +114,8 @@ export class ProductsService {
   }
 
   //elimina producto
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  async remove(id: number) {
+    const product = await this.findOne(id);
+    await this.productRepository.remove(product);
   }
 }
