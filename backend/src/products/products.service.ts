@@ -1,8 +1,13 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { ProductImage } from './entities/product-image.entity';
 
@@ -13,6 +18,7 @@ export class ProductsService {
     private productRepository: Repository<Product>,
     @InjectRepository(ProductImage)
     private productImageRepository: Repository<ProductImage>,
+    private readonly dataSource: DataSource,
   ) {}
 
   //crea producto
@@ -50,33 +56,65 @@ export class ProductsService {
     });
   }
 
-  //actualiza el producto
-  async updateProducto(id: number, files, updateProductDto: any) {
-    console.log('actualiza mi producto ', files);
-    const { title, description, price } = updateProductDto;
+ 
+  //actualiza el producto 2:forma.
+  async updateProducto(id: number, updateProductDto: any) {
+    const { images, ...update } = updateProductDto;
 
-    const producto = await this.productRepository.findOne({
-      where: { id },
-    });
+    console.log('imagenes', images);
+    console.log('update ', update);
+    console.log('updateProducto', updateProductDto)
 
-    //const doctorIds = doctors;
-    //const doctores = await this.doctorRepository.findBy({ id: In(doctorIds) });
-    //console.log('mihospital/paciente', mihospital, paciente, doctores);
-    producto.title = title;
-    producto.description = description;
-    producto.price = price;
-    if (files.length > 0) {
-      producto.images = files.map((image) =>
-        this.productImageRepository.create({ url: image }),
-      );
-      this.productImageRepository.delete({ product: producto });
+    const product = await this.productRepository.preload({ id, ...update });
+
+    if (!product)
+      throw new NotFoundException(`Product with id: ${id} not found`);
+
+    // Create query runner
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      if (images) {
+        await queryRunner.manager.delete(ProductImage, { product: { id } });
+
+        product.images = images.map((image) =>
+          this.productImageRepository.create({ url: image }),
+        );
+      }
+
+      // await this.productRepository.save( product );
+      await queryRunner.manager.save(product);
+
+      await queryRunner.commitTransaction();
+      await queryRunner.release();
+
+      return this.findOnePlain(+id);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      await queryRunner.release();
+      this.handleDBExceptions(error);
     }
+  }
+  private handleDBExceptions(error: any) {
+    if (error.code === '23505') throw new BadRequestException(error.detail);
 
-    // producto.images = images;
-   
-    return this.productRepository.save(producto);
+    // console.log(error)
+    throw new InternalServerErrorException(
+      'Unexpected error, check server logs',
+    );
   }
 
+  async findOnePlain(term: number) {
+    const { images = [], ...rest } = await this.findOne(term);
+    return {
+      ...rest,
+      images: images.map((image) => image.url),
+    };
+  }
+
+  //elimina producto
   remove(id: number) {
     return `This action removes a #${id} product`;
   }

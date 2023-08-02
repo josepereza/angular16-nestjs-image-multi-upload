@@ -3,8 +3,8 @@
 <a routerLink="/create">Ir a crear</a>
 
 <div class="container">
-    <div *ngFor="let item of productos" class="registros">
-   {{item.title}}
+    <div *ngFor="let item of productos" class="registros" (click)="update(item.id)" >
+   <h2>  {{item.title}}</h2>
    <div  *ngFor="let imagen of item.images " class="imagenes">
     <img src="http://localhost:3000/{{imagen.url}}" width="200px" alt="">
    </div>
